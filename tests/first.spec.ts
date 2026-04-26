@@ -6,4 +6,5 @@ test('This is the first test to check CICD',async ({ page })=>{
     await page.getByRole('textbox', { name: 'Password' }).fill('admin123');
     await page.getByRole('button', { name: 'Login' }).click();
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await page.getByText('Admin', { exact: true }).click();
 })
