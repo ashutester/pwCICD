@@ -1,9 +1,12 @@
 name: Playwright Tests
+env:
+  APP_USERNAME: ${{ secrets.APP_USERNAME }}
+  APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "**" ]
 jobs:
   test:
     timeout-minutes: 60
