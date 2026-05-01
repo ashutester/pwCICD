@@ -41,6 +41,16 @@ jobs:
             ls -la
           fi
       
+      - name: Debug - List files
+        if: always()
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Contents of current directory ==="
+          ls -la
+          echo "=== Contents of scripts folder ==="
+          ls -la scripts/ || echo "scripts folder not found!"
+      
       - name: Generate test metrics
         if: always()
         run: node scripts/generate-metrics.js
