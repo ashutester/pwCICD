@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Test Automation Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .last-updated {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .metric-unit {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .metric-change {
+            font-size: 0.85em;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .metric-change.positive {
+            color: #28a745;
+        }
+
+        .metric-change.negative {
+            color: #dc3545;
+        }
+
+        .metric-change.neutral {
+            color: #666;
+        }
+
+        /* Status indicators */
+        .status-good { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-bad { color: #dc3545; }
+
+        /* Charts */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+        }
+
+        /* Details sections */
+        .details-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .details-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .details-card h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .test-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-name {
+            flex: 1;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .test-metric {
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .test-metric.good { 
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .test-metric.warning { 
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .test-metric.bad { 
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        /* Error state */
+        .error {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            color: #dc3545;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .charts-section,
+            .details-section {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .metric-value {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Playwright Test Automation Dashboard</h1>
+            <p>Real-time test performance monitoring</p>
+        </div>
+
+        <div class="last-updated" id="lastUpdated"></div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Tests</div>
+                <div class="metric-value" id="totalTests">-</div>
+                <div class="metric-change neutral" id="totalTestsChange"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Pass Rate</div>
+                <div class="metric-value"><span id="passRate">-</span>%</div>
+                <div class="metric-change" id="passRateChange"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Failed Tests</div>
+                <div class="metric-value status-bad" id="failedTests">-</div>
+                <div class="metric-change" id="failedTestsChange"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Skipped Tests</div>
+                <div class="metric-value status-warning" id="skippedTests">-</div>
+                <div class="metric-change" id="skippedTestsChange"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Test Duration</div>
+                <div class="metric-value" id="avgDuration">-</div>
+                <div class="metric-unit">seconds</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Total Duration</div>
+                <div class="metric-value" id="totalDuration">-</div>
+                <div class="metric-unit">minutes</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>📈 Pass Rate Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="passRateChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h3>⏱️ Execution Time Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="durationChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h3>🔴 Failed Tests Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="failedChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h3>📊 Test Results Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details -->
+        <div class="details-section">
+            <div class="details-card">
+                <h3>🐌 Slowest Tests</h3>
+                <div id="slowestTests"></div>
+            </div>
+            <div class="details-card">
+                <h3>⚠️ Flaky Tests</h3>
+                <div id="flakyTests"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Last updated: <span id="footerTime"></span></p>
+            <p>Data refreshes automatically after each test run</p>
+        </div>
+    </div>
+
+    <script>
+        const CHART_COLORS = {
+            primary: '#667eea',
+            success: '#28a745',
+            danger: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8'
+        };
+
+        let chartInstances = {};
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('dashboard-data.json');
+                if (!response.ok) throw new Error('No data available yet');
+                
+                const data = await response.json();
+                if (!data || data.length === 0) {
+                    showError('No test data available yet. Run tests to populate the dashboard.');
+                    return;
+                }
+
+                updateMetrics(data);
+                createCharts(data);
+                updateDetails(data);
+                updateTimestamp(data[data.length - 1]);
+            } catch (error) {
+                showError('Error loading dashboard data: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        function updateMetrics(data) {
+            const latest = data[data.length - 1];
+            const previous = data.length > 1 ? data[data.length - 2] : latest;
+
+            // Total Tests
+            document.getElementById('totalTests').textContent = latest.totalTests;
+            const totalChange = latest.totalTests - previous.totalTests;
+            document.getElementById('totalTestsChange').textContent = 
+                totalChange !== 0 ? `${totalChange > 0 ? '+' : ''}${totalChange} from last run` : '';
+
+            // Pass Rate
+            const passRate = parseFloat(latest.passRate);
+            const previousPassRate = parseFloat(previous.passRate);
+            document.getElementById('passRate').textContent = passRate.toFixed(1);
+            const passRateChange = passRate - previousPassRate;
+            const passRateEl = document.getElementById('passRateChange');
+            passRateEl.textContent = `${passRateChange > 0 ? '+' : ''}${passRateChange.toFixed(1)}% from last run`;
+            passRateEl.className = 'metric-change ' + (passRateChange >= 0 ? 'positive' : 'negative');
+
+            // Failed Tests
+            document.getElementById('failedTests').textContent = latest.failed;
+            const failedChange = latest.failed - previous.failed;
+            const failedEl = document.getElementById('failedTestsChange');
+            failedEl.textContent = `${failedChange > 0 ? '+' : ''}${failedChange} from last run`;
+            failedEl.className = 'metric-change ' + (failedChange <= 0 ? 'positive' : 'negative');
+
+            // Skipped Tests
+            document.getElementById('skippedTests').textContent = latest.skipped;
+
+            // Duration
+            document.getElementById('avgDuration').textContent = latest.avgDuration + 's';
+            document.getElementById('totalDuration').textContent = (latest.totalDuration / 60000).toFixed(1);
+        }
+
+        function createCharts(data) {
+            const labels = data.map(d => new Date(d.date).toLocaleDateString());
+            const passRates = data.map(d => parseFloat(d.passRate));
+            const durations = data.map(d => parseInt(d.totalDuration) / 1000);
+            const failedCounts = data.map(d => d.failed);
+            const passedCounts = data.map(d => d.passed);
+            const skippedCounts = data.map(d => d.skipped);
+
+            // Chart options
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { font: { size: 12 } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { font: { size: 11 } }
+                    },
+                    x: {
+                        ticks: { font: { size: 11 } }
+                    }
+                }
+            };
+
+            // Pass Rate Chart
+            if (chartInstances.passRate) chartInstances.passRate.destroy();
+            chartInstances.passRate = new Chart(document.getElementById('passRateChart'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Pass Rate (%)',
+                        data: passRates,
+                        borderColor: CHART_COLORS.success,
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // Duration Chart
+            if (chartInstances.duration) chartInstances.duration.destroy();
+            chartInstances.duration = new Chart(document.getElementById('durationChart'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Total Duration (seconds)',
+                        data: durations,
+                        borderColor: CHART_COLORS.info,
+                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // Failed Tests Chart
+            if (chartInstances.failed) chartInstances.failed.destroy();
+            chartInstances.failed = new Chart(document.getElementById('failedChart'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Failed',
+                        data: failedCounts,
+                        backgroundColor: CHART_COLORS.danger
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // Distribution Chart
+            if (chartInstances.distribution) chartInstances.distribution.destroy();
+            const latestData = data[data.length - 1];
+            chartInstances.distribution = new Chart(document.getElementById('distributionChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Passed', 'Failed', 'Skipped'],
+                    datasets: [{
+                        data: [latestData.passed, latestData.failed, latestData.skipped],
+                        backgroundColor: [CHART_COLORS.success, CHART_COLORS.danger, CHART_COLORS.warning]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDetails(data) {
+            const latest = data[data.length - 1];
+
+            // Slowest Tests
+            const slowestHtml = latest.slowestTests && latest.slowestTests.length > 0
+                ? latest.slowestTests.map(test => `
+                    <div class="test-item">
+                        <div class="test-name">${test.title || 'Unknown'}</div>
+                        <div class="test-metric">${(test.duration / 1000).toFixed(2)}s</div>
+                    </div>
+                `).join('')
+                : '<div class="test-item"><p style="color: #999;">No test data available</p></div>';
+            document.getElementById('slowestTests').innerHTML = slowestHtml;
+
+            // Flaky Tests
+            const flakyHtml = latest.flakyTests && latest.flakyTests.length > 0
+                ? latest.flakyTests.map(test => {
+                    const flakinessNum = parseFloat(test.flakiness);
+                    let statusClass = 'good';
+                    if (flakinessNum > 50) statusClass = 'bad';
+                    else if (flakinessNum > 20) statusClass = 'warning';
+                    return `
+                        <div class="test-item">
+                            <div class="test-name">${test.title || 'Unknown'}</div>
+                            <div class="test-metric ${statusClass}">${test.flakiness}% flaky</div>
+                        </div>
+                    `;
+                }).join('')
+                : '<div class="test-item"><p style="color: #999;">No flaky tests detected!</p></div>';
+            document.getElementById('flakyTests').innerHTML = flakyHtml;
+        }
+
+        function updateTimestamp(latestData) {
+            const date = new Date(latestData.date);
+            const formatted = date.toLocaleString();
+            document.getElementById('lastUpdated').textContent = `Last updated: ${formatted}`;
+            document.getElementById('footerTime').textContent = formatted;
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.metrics-grid'));
+        }
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadDashboard, 30000);
+    </script>
+</body>
+</html>

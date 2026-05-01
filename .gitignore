@@ -7,3 +7,18 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .env
+test-results.json
+playwright-report/
+.playwright/
+node_modules/
+dist/
+ 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+ 
+# OS
+.DS_Store
+Thumbs.db
