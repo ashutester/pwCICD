@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "date": "2026-05-01T17:57:06.483Z",
+    "timestamp": 1777658226483,
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "passRate": "0.00",
+    "totalDuration": 11300.586,
+    "avgDuration": "11300.59",
+    "slowestTests": [],
+    "flakyTests": [],
+    "branch": "main",
+    "commit": "0a8ba8d",
+    "workflow": "Playwright Tests & Dashboard"
+  }
+]
