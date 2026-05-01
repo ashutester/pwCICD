@@ -45,13 +45,25 @@ jobs:
         if: always()
         run: node scripts/generate-metrics.js
       
-      - name: Commit dashboard data
+      - name: Commit and push dashboard data
         if: always()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add docs/dashboard-data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update test dashboard - $(date)" && git pull --rebase && git push)
+          
+          # Check if there are changes to commit
+          if ! git diff --quiet --cached; then
+            git commit -m "Update test dashboard - $(date)"
+            
+            # Pull with merge strategy that favors our changes
+            git pull --no-rebase -X ours
+            
+            # Push to remote
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
       
       - name: Upload HTML Report
         if: always()
