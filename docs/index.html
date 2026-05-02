@@ -128,18 +128,29 @@
             padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             position: relative;
-            height: 400px;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .chart-container h3 {
             margin-bottom: 20px;
             color: #333;
             font-size: 1.2em;
+            flex-shrink: 0;
         }
 
         .chart-wrapper {
             position: relative;
-            height: 350px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .chart-wrapper canvas {
+            max-width: 100% !important;
+            max-height: 100% !important;
         }
 
         /* Details sections */
@@ -247,6 +258,10 @@
 
             .metric-value {
                 font-size: 2em;
+            }
+
+            .chart-container {
+                height: 350px;
             }
         }
     </style>
