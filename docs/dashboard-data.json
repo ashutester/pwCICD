@@ -334,5 +334,21 @@
     "branch": "main",
     "commit": "8eaca52",
     "workflow": "Playwright Tests & Dashboard"
+  },
+  {
+    "date": "2026-05-18T13:02:12.622Z",
+    "timestamp": 1779109332622,
+    "totalTests": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "passRate": "0.00",
+    "totalDuration": 91454.517,
+    "avgDuration": "91454.52",
+    "slowestTests": [],
+    "flakyTests": [],
+    "branch": "main",
+    "commit": "c2cd338",
+    "workflow": "Playwright Tests & Dashboard"
   }
 ]
