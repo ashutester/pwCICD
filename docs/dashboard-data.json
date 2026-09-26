@@ -1,21 +1,5 @@
 [
   {
-    "date": "2026-06-28T11:41:15.979Z",
-    "timestamp": 1782646875980,
-    "totalTests": 2,
-    "passed": 2,
-    "failed": 0,
-    "skipped": 0,
-    "passRate": "100.00",
-    "totalDuration": 6457.977,
-    "avgDuration": "3228.99",
-    "slowestTests": [],
-    "flakyTests": [],
-    "branch": "main",
-    "commit": "8dac29b",
-    "workflow": "Playwright Tests & Dashboard"
-  },
-  {
     "date": "2026-06-29T13:58:15.867Z",
     "timestamp": 1782741495867,
     "totalTests": 2,
@@ -1437,6 +1421,22 @@
     "flakyTests": [],
     "branch": "main",
     "commit": "3f81adf",
+    "workflow": "Playwright Tests & Dashboard"
+  },
+  {
+    "date": "2026-09-26T13:57:51.990Z",
+    "timestamp": 1790431071990,
+    "totalTests": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "passRate": "100.00",
+    "totalDuration": 5727.204000000001,
+    "avgDuration": "2863.60",
+    "slowestTests": [],
+    "flakyTests": [],
+    "branch": "main",
+    "commit": "0099674",
     "workflow": "Playwright Tests & Dashboard"
   }
 ]
