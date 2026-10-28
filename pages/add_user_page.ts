@@ -31,11 +31,13 @@ class Add_User_Page {
         await this.selectStatus.click();
         await this.enabledOption.click();
         await this.txtUsername.fill(username);
-        await this.txtBxHints.fill("Linda  Anderson");
+        await this.txtBxHints.pressSequentially("Rahul  Das");
+        await this.page.getByText('Rahul Das').first().click();
         await this.txtPassword.fill(password);
         await this.txtConfirmPassword.fill(password);
         await this.btnSave.click();
     }
+
 }
 
 export default Add_User_Page;
